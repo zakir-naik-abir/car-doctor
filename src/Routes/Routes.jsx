@@ -4,7 +4,10 @@ import ErrorElement from "../Pages/ErrorElement";
 import Home from "../Pages/Home/Home";
 import Login from "../Pages/Register/Login";
 import Signup from "../Pages/Register/Signup";
-import Checkout from "../Pages/Checkout/Checkout";
+import BookService from "../Pages/BookService/BookService";
+import Bookings from "../Pages/BookService/Bookings";
+import UpdateProfile from "../Pages/Register/UpdateProfile";
+import PrivateRoute from "./PrivateRoute";
 
 export const router = createBrowserRouter([
   {
@@ -24,10 +27,18 @@ export const router = createBrowserRouter([
         path: '/signup',
         element: <Signup></Signup>,
       },
-       {
-        path: '/checkout/:id',
-        element: <Checkout></Checkout>,
-        loader: () =>fetch('services.json'),
+      {
+        path: '/updateProfile',
+        element: <PrivateRoute><UpdateProfile></UpdateProfile></PrivateRoute>,
+      },
+      {
+        path: '/book/:id',
+        element: <PrivateRoute><BookService></BookService></PrivateRoute>,
+        loader: ({params}) =>fetch(`http://localhost:5000/services/${params.id}`),
+      },
+      {
+        path: '/bookings',
+        element: <PrivateRoute><Bookings></Bookings></PrivateRoute>,
       },
       
     ]

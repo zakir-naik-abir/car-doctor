@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import registerImg from "../../../src/assets/images/login/login.svg"
 import { useContext, useState } from "react"
 import { AuthContext } from "../../Providers/AuthProvider"
@@ -12,6 +12,9 @@ const Signup = () => {
   const {showPassword, setShowPassword} = useContext(AuthContext);
   const [signupError, setSignupError] = useState('')
   const [signupSuccess, setSignupSuccess] = useState('')
+  const location = useLocation();
+  console.log(location)
+  const navigate = useNavigate();
 
   
   const handleSignup = event =>{
@@ -57,6 +60,7 @@ const Signup = () => {
     .then(result =>{
       console.log(result);
       setSignupSuccess("Registration Successful")
+      navigate(location?.state ? location?.state : '/')
 
       updateProfile(result.user, {
         displayName: name,
@@ -64,6 +68,7 @@ const Signup = () => {
       })
       .then( () =>{
         console.log('Profile updated')
+        navigate(location?.state ? location?.state : '/')
       })
       .catch()
   
@@ -86,7 +91,7 @@ const Signup = () => {
           <div className="text-center lg:text-right">
             <img src={registerImg} />
           </div>
-          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100  py-5">
             <h1 className="text-5xl font-bold text-center">Sign Up</h1>
             <form onSubmit={handleSignup} className="card-body">
               <div className="form-control">
@@ -120,10 +125,10 @@ const Signup = () => {
               </div>
               <div>
                 {
-                  signupError && <p>{signupError}</p>
+                  signupError && <p className="text-yellow-400 font-bold">{signupError}</p>
                 }
                 {
-                  signupSuccess && <p>{signupSuccess}</p>
+                  signupSuccess && <p className="text-green-600 font-bold ">{signupSuccess}</p>
                 }
               </div>
               <div className="form-control mt-1">

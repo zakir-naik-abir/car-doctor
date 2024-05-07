@@ -1,10 +1,17 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import registerImg from "../../../src/assets/images/login/login.svg"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { AuthContext } from "../../Providers/AuthProvider"
+import { IoEye } from "react-icons/io5";
+import { IoMdEyeOff } from "react-icons/io";
+import axios from 'axios'
 
 const Login = () => {
   const {success, setSuccess, error, setError, loginUser, googleLogin, githubLogin, forgetPassword } = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState();
+  const location = useLocation();
+  console.log(location)
+  const navigate = useNavigate();
 
   const handleLogin = event =>{
     event.preventDefault();
@@ -16,11 +23,18 @@ const Login = () => {
     setError('');
     setSuccess('');
 
-    console.log(email, password);
     loginUser(email, password)
     .then(result =>{
-      console.log(result);
-      setSuccess('Login Successful');
+      const loggedInUser = result.user;
+      console.log(loggedInUser);
+      const user = {email};
+      // setSuccess('Login Successful');
+      // navigate(location?.state ? location?.state : '/')
+      // get access token
+      axios.post('http://localhost:5000/jwt', user)
+      .then(res => {
+        console.log(res.data)
+      })
     })
     .catch(error =>{
       console.error(error);
@@ -32,6 +46,7 @@ const Login = () => {
     googleLogin()
     .then(result =>{
       console.log(result)
+      navigate(location?.state ? location?.state : '/')
     })
     .catch(error =>{
       console.error(error)
@@ -51,6 +66,7 @@ const Login = () => {
     .then(result =>{
       console.log(result);
       alert('Password resend successful. Check your email')
+      navigate(location?.state ? location?.state : '/')
     })
     .catch(error =>{
       console.error(error);
@@ -64,7 +80,7 @@ const Login = () => {
           <div className="text-center lg:text-right">
             <img src={registerImg} />
           </div>
-          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100 py-4">
             <h1 className="text-5xl font-bold text-center">Login</h1>
             <form onSubmit={handleLogin} className="card-body">
               <div className="form-control">
@@ -77,7 +93,15 @@ const Login = () => {
                 <label className="label">
                   <span className="label-text">Password</span>
                 </label>
-                <input type="password" name="password" placeholder="password" className="input input-bordered" required />
+                <div className="relative items-center">
+                  <input className='input input-bordered w-full' type={showPassword ? "password" : "text" } name='password'  placeholder='Create Password' required/>
+                  <span onClick={() => setShowPassword(!showPassword)} className="absolute top-3 right-4 text-2xl">
+                    {
+                      showPassword ? <IoMdEyeOff></IoMdEyeOff> : <IoEye></IoEye>
+                    }
+                  </span>
+                </div>
+
                 <label className="label">
                   <a onClick={handleForget} href="#" className="label-text-alt link link-hover">Forgot password?</a>
                 </label>
