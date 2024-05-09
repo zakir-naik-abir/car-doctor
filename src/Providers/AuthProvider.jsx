@@ -1,6 +1,7 @@
 import { GithubAuthProvider, GoogleAuthProvider, createUserWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import { auth } from "../Firebase/firebase.config";
+import axios from "axios";
 
 export const AuthContext = createContext(null)
 const AuthProvider = ({children}) => {
@@ -40,9 +41,24 @@ const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   useEffect( () =>{
     const unSubscribe = onAuthStateChanged(auth, currentUser =>{
-      console.log('User in the on state changed:', currentUser);
+      const userEmail = currentUser?.email || user?.email;
+      const loggedUser = {email: userEmail};
       setUser(currentUser);
+      console.log('Current user:', currentUser);
       setLoading(false);
+      // if user exists then issue a token
+      if(currentUser){
+        axios.post('https://car-doctor-server-seven-gold.vercel.app/jwt', loggedUser, {withCredentials: true})
+        .then(res => {
+          console.log('token response', res.data);
+        })
+      }
+      else{
+        axios.post('https://car-doctor-server-seven-gold.vercel.app/logout', loggedUser, {withCredentials: true})
+        .then(res =>{
+          console.log(res.data);
+        })
+      }
     })
     return unSubscribe;
   },[])

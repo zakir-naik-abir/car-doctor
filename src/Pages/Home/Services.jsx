@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react"
 import ServiceCard from "./ServiceCard";
+import axios from "axios";
 
 const Services = () => {
 
   const [services, setServices] = useState([]);
 
+  const url = 'https://car-doctor-server-seven-gold.vercel.app/services';
   useEffect( () =>{
-    fetch('http://localhost:5000/services')
-    .then(res => res.json())
-    .then(data => setServices(data))
-  },[])
+    // fetch(url)
+    // .then(res => res.json())
+    // .then(data => setServices(data))
+    axios.get(url, {withCredentials: true})
+    .then(res => {
+      setServices(res.data);
+    })
+  },[url])
+  
 
   return (
     <div className="mt-4">
@@ -20,7 +27,7 @@ const Services = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {
-          services.map(service => <ServiceCard key={service.id} service={service}></ServiceCard>)
+          services?.map(service => <ServiceCard key={service.id} service={service}></ServiceCard>)
         }
       </div>
     </div>
